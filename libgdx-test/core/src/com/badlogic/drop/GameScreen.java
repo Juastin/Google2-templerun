@@ -155,14 +155,14 @@ public class GameScreen implements Screen {
     }
 
     @Override
-    public void resize(int width, int height) {
-    }
-
-    @Override
     public void show() {
         // start the playback of the background music
         // when the screen is shown
         rainMusic.play();
+    }
+
+    @Override
+    public void resize(int width, int height) {
     }
 
     @Override
@@ -184,5 +184,4 @@ public class GameScreen implements Screen {
         dropSound.dispose();
         rainMusic.dispose();
     }
-
 }

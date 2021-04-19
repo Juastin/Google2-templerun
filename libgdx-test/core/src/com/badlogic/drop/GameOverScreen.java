@@ -20,11 +20,6 @@ public class GameOverScreen implements Screen {
         camera.setToOrtho(false, 800, 480);
     }
 
-    @Override
-    public void show() {
-
-    }
-
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0.2f, 1);
 
@@ -40,6 +35,11 @@ public class GameOverScreen implements Screen {
             game.setScreen(new GameScreen(game));
             dispose();
         }
+    }
+
+    @Override
+    public void show() {
+
     }
 
     @Override
@@ -64,8 +64,5 @@ public class GameOverScreen implements Screen {
 
     @Override
     public void dispose() {
-
     }
-    //...Rest of class omitted for succinctness.
-
 }

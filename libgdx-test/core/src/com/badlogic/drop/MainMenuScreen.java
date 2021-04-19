@@ -74,26 +74,28 @@ public class MainMenuScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
         Skin skin = new Skin(Gdx.files.internal("skin/craftacular-ui.json"));
 
+        //Maken onderdelen voor scherm
         lUsername = new Label("Enter username:", skin);
-        tfUsername = new TextField("", skin);
-        tbStart = new TextButton("Play", skin);
-
         lUsername.setPosition(stage.getWidth() / 2 - lUsername.getWidth()/2, stage.getHeight() / 2 - lUsername.getHeight()/2+50);
+        tfUsername = new TextField("", skin);
         tfUsername.setSize(500, 60);
         tfUsername.setPosition(stage.getWidth() / 2 - tfUsername.getWidth()/2, stage.getHeight() / 2 - tfUsername.getHeight()/2);
+        tbStart = new TextButton("Play", skin);
         tbStart.setSize(300, 60);
         tbStart.setPosition(stage.getWidth() / 2 - tbStart.getWidth()/2, stage.getHeight() / 2 - tbStart.getHeight()/2-70);
 
+        //Toevoegen onderdelen aan scherm
+        stage.addActor(tfUsername);
+        stage.addActor(lUsername);
+        stage.addActor(tbStart);
+
+        //Luisteren naar knop
         tbStart.addListener(new ClickListener() {
             @Override
             public void touchUp(InputEvent e, float x, float y, int point, int button) {
                 tbStartClicked();
             }
         });
-
-        stage.addActor(tfUsername);
-        stage.addActor(lUsername);
-        stage.addActor(tbStart);
     }
 
     public void tbStartClicked() {
@@ -102,24 +104,14 @@ public class MainMenuScreen implements Screen {
         dispose();
     }
 
-    @Override
-    public void show() {
-
-    }
-
     public void render(float delta) {
         ScreenUtils.clear(94/255f, 51/255f, 30/255f, 1);
-
-//        camera.update();
-//        game.batch.setProjectionMatrix(camera.combined);
-
-//        game.batch.begin();
-//        game.font.draw(game.batch, "Welcome to Drop!!! ", 100, 150);
-//        game.font.draw(game.batch, "Tap anywhere to begin!", 100, 100);
-//        game.batch.end();
-
         stage.act(delta);
         stage.draw();
+    }
+
+    @Override
+    public void show() {
 
     }
 
@@ -145,8 +137,6 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        stage.dispose();
     }
-    //...Rest of class omitted for succinctness.
-
 }
