@@ -29,7 +29,7 @@ public class MainMenuScreen implements Screen {
     private TextButton tbStart;
     private Stage stage;
 
-    private String username;
+    String username;
 
     //Connectie voor Arduino
     private long diff, start = System.currentTimeMillis();
@@ -97,7 +97,7 @@ public class MainMenuScreen implements Screen {
     }
 
     public void tbStartClicked() {
-        String username = tfUsername.getText();
+        username = tfUsername.getText();
         game.setScreen(new GameScreen(game));
         dispose();
     }
