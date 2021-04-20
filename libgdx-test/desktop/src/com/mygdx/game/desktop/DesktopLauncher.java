@@ -2,8 +2,7 @@ package com.mygdx.game.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.badlogic.drop.Drop;
-import com.mygdx.game.MyGdxGame;
+import com.badlogic.drop.*;
 
 import java.net.SocketException;
 
