@@ -3,6 +3,7 @@ package com.badlogic.drop;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.loaders.AssetLoader;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -34,6 +35,7 @@ public class MainMenuScreen implements Screen {
     private TextButton tbStart;
     private Stage stage;
     public Skin skin;
+    Sound menuClick;
 
     public String username;
 
@@ -78,6 +80,8 @@ public class MainMenuScreen implements Screen {
             }
         });
 
+        menuClick = Gdx.audio.newSound(Gdx.files.internal("minecraft_click.mp3"));
+
         titleStyle = new Label.LabelStyle();
         titleStyle.font = new BitmapFont(Gdx.files.internal("font/font-title-export.fnt"));
 
@@ -113,6 +117,7 @@ public class MainMenuScreen implements Screen {
     }
 
     public void tbStartClicked() {
+        menuClick.play();
         if (!tfUsername.getText().equals("")) {
             username = tfUsername.getText();
         } else {
@@ -125,7 +130,7 @@ public class MainMenuScreen implements Screen {
     }
 
     public void render(float delta) {
-        ScreenUtils.clear(94/255f, 51/255f, 30/255f, 1);
+        ScreenUtils.clear(60/255f, 30/255f, 30/255f, 1);
         stage.act(delta);
         stage.draw();
     }
