@@ -20,6 +20,7 @@ import com.fazecast.jSerialComm.SerialPortEvent;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.util.ArrayList;
 
 public class MainMenuScreen implements Screen {
     final Drop game;
@@ -100,6 +101,8 @@ public class MainMenuScreen implements Screen {
 
     public void tbStartClicked() {
         username = tfUsername.getText();
+        Database.query(String.format("insert into namen (gebruikersnaam) Select '%s' Where not exists(select * from namen where gebruikersnaam='%s')", username, username));
+        System.out.println("player: " + username);
         game.setScreen(new GameScreen(game));
         dispose();
     }
