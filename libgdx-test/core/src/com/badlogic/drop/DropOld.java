@@ -36,6 +36,8 @@ public class DropOld extends ApplicationAdapter {
     private long diff, start = System.currentTimeMillis();
     public String input = "";
     final SerialPort comPort = SerialPort.getCommPort("COM3");
+    int sleep = 0;
+    String previousinput = "";
 
     int MAX_LEN = 2048;
     int localPortNum = 22;
@@ -112,13 +114,19 @@ public class DropOld extends ApplicationAdapter {
 
     @Override
     public void render() {
-        try {
-            mySocket.setSoTimeout(1);
-            mySocket.receive(packet);
-            String message = new String(buffer);
-            input = message;
-        } catch (IOException e) {
+        if (sleep == 3) {
+            try {
+                mySocket.setSoTimeout(1);
+                mySocket.receive(packet);
+                String message = new String(buffer);
+                input = message;
+            } catch (IOException e) {
+            }
+            sleep = 0;
+        } else {
+            input = previousinput;
         }
+        sleep++;
         int fps = 60;
         // clear the screen with a dark blue color. The
         // arguments to clear are the red, green
@@ -150,9 +158,13 @@ public class DropOld extends ApplicationAdapter {
             bucket.x = touchPos.x - 64 / 2;
         }
 
-        if(input.contains("left") || input.contains("A")) bucket.x -= 400 * Gdx.graphics.getDeltaTime();
-        if(input.contains("right") || input.contains("D")) bucket.x += 400 * Gdx.graphics.getDeltaTime();
+        if(input.contains("A")) bucket.x -= 400 * Gdx.graphics.getDeltaTime();
+        if(input.contains("D")) bucket.x += 400 * Gdx.graphics.getDeltaTime();
+        if(input.contains("left")) bucket.x -= 400 * Gdx.graphics.getDeltaTime();
+        if(input.contains("right")) bucket.x += 400 * Gdx.graphics.getDeltaTime();
+        previousinput = input;
         input = "";
+
         // make sure the bucket stays within the screen bounds
         if(bucket.x < 0) bucket.x = 0;
         if(bucket.x > 800 - 64) bucket.x = 800 - 64;
