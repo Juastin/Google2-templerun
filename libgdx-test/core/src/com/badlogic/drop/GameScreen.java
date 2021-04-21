@@ -150,7 +150,9 @@ public class GameScreen implements Screen {
 
         if(game.screen.input.contains("left") || game.screen.input.contains("A")) bucket.x -= 800 * Gdx.graphics.getDeltaTime();
         if(game.screen.input.contains("right") || game.screen.input.contains("D")) bucket.x += 800 * Gdx.graphics.getDeltaTime();
+
         if(game.screen.input.contains("middle") || Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){pauze=true;}
+
 
         game.screen.input = "";
 
@@ -170,6 +172,7 @@ public class GameScreen implements Screen {
 
         // check if we need to create a new raindrop
         if(!pauze) {
+            if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){pauze=false;}
             rainMusic.play();
             if (TimeUtils.nanoTime() - lastDropTime > 1000000000)
                 spawnRaindrop();
