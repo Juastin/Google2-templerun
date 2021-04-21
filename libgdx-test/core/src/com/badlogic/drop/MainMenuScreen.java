@@ -123,7 +123,7 @@ public class MainMenuScreen implements Screen {
         } else {
             username = "Gastgebruiker";
         }
-        Database.query(String.format("insert into namen (gebruikersnaam) Select '%s' Where not exists(select * from namen where gebruikersnaam='%s')", username, username));
+        QueryRepository.insertName(username);
         System.out.println("player: " + username);
         game.setScreen(new GameScreen(game));
         dispose();
