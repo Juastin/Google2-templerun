@@ -7,8 +7,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
@@ -38,6 +38,15 @@ public class GameScreen implements Screen {
     private boolean pauze=false;
     private Stage stage;
     private TextButton con;
+    private Slider rwaarde;
+    private Slider gwaarde;
+    private Slider bwaarde;
+    private Slider difficulty;
+    private Label moeilijkheid;
+    private Label rood;
+    private Label groen;
+    private Label blauw;
+
 
     public GameScreen(final Drop game) {
         this.game = game;
@@ -70,9 +79,53 @@ public class GameScreen implements Screen {
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
         Skin skin = new Skin(Gdx.files.internal("skin/craftacular-ui.json"));
+
         con = new TextButton("Continue",skin);
+        moeilijkheid = new Label("Difficulty",skin);
+        moeilijkheid.setTouchable(Touchable.disabled);
+
+        difficulty = new Slider(100,600,1,false,skin);
+        rood = new Label("R",skin);
+        groen = new Label("G",skin);
+        blauw = new Label("B",skin);
+        rood.setTouchable(Touchable.disabled);
+        groen.setTouchable(Touchable.disabled);
+        blauw.setTouchable(Touchable.disabled);
+
+        difficulty.setWidth(moeilijkheid.getWidth()+50);
+        rwaarde = new Slider(0,255,1,false,skin);
+        gwaarde = new Slider(0,255,1,false,skin);
+        bwaarde = new Slider(0,255,1,false,skin);
+
+
+
         con.setPosition(200,80);
+        difficulty.setPosition(400,400);
+        rwaarde.setPosition(200,400);
+        gwaarde.setPosition(200,300);
+        bwaarde.setPosition(200,200);
+
+        moeilijkheid.setPosition((difficulty.getX()+difficulty.getWidth()/2)-moeilijkheid.getWidth()/2,415);
+        rood.setPosition((rwaarde.getX()+rwaarde.getWidth()/2)-rood.getWidth()/2,410);
+        groen.setPosition((gwaarde.getX()+gwaarde.getWidth()/2)-groen.getWidth()/2,310);
+        blauw.setPosition((bwaarde.getX()+bwaarde.getWidth()/2)-blauw.getWidth()/2,210);
+
+        difficulty.setValue(200);
+        rwaarde.setValue(0);
+        gwaarde.setValue(0);
+        bwaarde.setValue(51);
+
+
+        stage.addActor(difficulty);
+        stage.addActor(moeilijkheid);
         stage.addActor(con);
+        stage.addActor(rwaarde);
+        stage.addActor(gwaarde);
+        stage.addActor(bwaarde);
+        stage.addActor(rood);
+        stage.addActor(groen);
+        stage.addActor(blauw);
+
         con.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -96,7 +149,7 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         //Ophalen button data van Raspberry Pi
-        if (game.screen.sleep == 3) {
+        if (game.screen.sleep ==3) {
             try {
                 game.screen.mySocket.setSoTimeout(1);
                 game.screen.mySocket.receive(game.screen.packet);
@@ -109,9 +162,8 @@ public class GameScreen implements Screen {
             game.screen.input = game.screen.previousinput;
         }
 
+
         if(game.screen.input.contains("left")||game.screen.input.contains("right")){pauze=false;}
-
-
         game.screen.sleep++;
 
 
@@ -120,7 +172,7 @@ public class GameScreen implements Screen {
         // arguments to clear are the red, green
         // blue and alpha component in the range [0,1]
         // of the color to be used to clear the screen.
-        ScreenUtils.clear(0, 0, 0.2f, 1);
+        ScreenUtils.clear(rwaarde.getValue()/255f, gwaarde.getValue()/255f, bwaarde.getValue()/255f, 1);
 
         // tell the camera to update its matrices.
         camera.update();
@@ -140,6 +192,7 @@ public class GameScreen implements Screen {
         game.batch.end();
 
 
+
         // process user input
         if (Gdx.input.isTouched()) {
             Vector3 touchPos = new Vector3();
@@ -150,19 +203,25 @@ public class GameScreen implements Screen {
 
         if(game.screen.input.contains("left") || game.screen.input.contains("A")) bucket.x -= 800 * Gdx.graphics.getDeltaTime();
         if(game.screen.input.contains("right") || game.screen.input.contains("D")) bucket.x += 800 * Gdx.graphics.getDeltaTime();
-
         if(game.screen.input.contains("middle") || Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){pauze=true;}
-
+        game.screen.previousinput = game.screen.input;
 
         game.screen.input = "";
 
         if(pauze){
             rainMusic.pause();
             con.setVisible(true);
+            rwaarde.setVisible(true);
+            gwaarde.setVisible(true);
+            bwaarde.setVisible(true);
+            difficulty.setVisible(true);
+            moeilijkheid.setVisible(true);
+            rood.setVisible(true);
+            groen.setVisible(true);
+            blauw.setVisible(true);
             stage.act(delta);
             stage.draw();
         }
-
 
         // make sure the bucket stays within the screen bounds
         if (bucket.x < 0)
@@ -186,7 +245,7 @@ public class GameScreen implements Screen {
                 if (Gdx.graphics.getDeltaTime() > 0.3) {
                     System.out.println("niets");
                 } else {
-                    raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
+                    raindrop.y -= difficulty.getValue() * Gdx.graphics.getDeltaTime();
                 }
 
                 if (raindrop.y < 0) {
