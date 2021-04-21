@@ -19,9 +19,9 @@ public class Database {
 //    static String host = "jdbc:mysql://40.113.153.48/Google2";
 //    static String username = "google2";
 //    static String password = "windesheim123?";
-    static String host = "jdbc:mysql://localhost:3306/templerun";
-    static String username = "root";
-    static String password = "";
+    static String host = "jdbc:mysql://40.113.153.48/templerun";
+    static String username = "newRemote";
+    static String password = "P@ssw0rd";
 
     public static Connection maakVerbinding() {
         try {

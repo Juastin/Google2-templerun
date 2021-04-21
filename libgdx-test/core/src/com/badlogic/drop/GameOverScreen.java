@@ -88,12 +88,14 @@ public class GameOverScreen implements Screen {
             @Override
             public void touchUp(InputEvent e, float x, float y, int point, int button) {
                 tbStartClicked();
+                game.screen.menuClick.play();
             }
         });
     }
 
     public void tbStartClicked() {
         game.setScreen(new GameScreen(game));
+        game.screen.menuClick.play();
     }
 
     public void render(float delta) {

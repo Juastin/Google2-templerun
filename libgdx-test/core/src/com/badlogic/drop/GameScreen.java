@@ -134,6 +134,7 @@ public class GameScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 change();
+                game.screen.menuClick.play();
             }
         });
 
