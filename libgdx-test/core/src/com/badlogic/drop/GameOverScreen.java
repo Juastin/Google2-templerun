@@ -35,7 +35,6 @@ public class GameOverScreen implements Screen {
         //Database.query(String.format("INSERT INTO highscore VALUES (%s,%s)",points,playerid.get(0).get(0)));
         QueryRepository.inserthighscore(points,playerid.get(0).get(0));
 
-        System.out.println(playerid.get(0).get(0));
         titleStyle = new Label.LabelStyle();
         titleStyle.font = new BitmapFont(Gdx.files.internal("font/font-title-export.fnt"));
 

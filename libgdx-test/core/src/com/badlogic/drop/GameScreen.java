@@ -30,6 +30,8 @@ public class GameScreen implements Screen {
     Texture bucketImage;
     Sound dropSound;
     Music rainMusic;
+    Music stormTheme;
+    Music setMusic;
     OrthographicCamera camera;
     Rectangle bucket;
     Array<Rectangle> raindrops;
@@ -49,7 +51,9 @@ public class GameScreen implements Screen {
         // load the drop sound effect and the rain background "music"
         dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
         rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
-        rainMusic.setLooping(true);
+        stormTheme = Gdx.audio.newMusic(Gdx.files.internal("Google2_-_Temple_Run_Original_Theme.mp3"));
+        setMusic = stormTheme;
+        setMusic.setLooping(true);
 
         // create the camera and the SpriteBatch
         camera = new OrthographicCamera();
@@ -96,7 +100,7 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         //Ophalen button data van Raspberry Pi
-        if (game.screen.sleep == 3) {
+        if (game.screen.sleep == 2) {
             try {
                 game.screen.mySocket.setSoTimeout(1);
                 game.screen.mySocket.receive(game.screen.packet);
@@ -109,11 +113,9 @@ public class GameScreen implements Screen {
             game.screen.input = game.screen.previousinput;
         }
 
-        if(game.screen.input.contains("left")||game.screen.input.contains("right")){pauze=false;}
-
-
         game.screen.sleep++;
 
+        if(game.screen.input.contains("left")||game.screen.input.contains("right")){pauze=false;}
 
 
         // clear the screen with a dark blue color. The
@@ -150,14 +152,13 @@ public class GameScreen implements Screen {
 
         if(game.screen.input.contains("left") || game.screen.input.contains("A")) bucket.x -= 800 * Gdx.graphics.getDeltaTime();
         if(game.screen.input.contains("right") || game.screen.input.contains("D")) bucket.x += 800 * Gdx.graphics.getDeltaTime();
-
         if(game.screen.input.contains("middle") || Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){pauze=true;}
-
+        game.screen.previousinput = game.screen.input;
 
         game.screen.input = "";
 
         if(pauze){
-            rainMusic.pause();
+            setMusic.pause();
             con.setVisible(true);
             stage.act(delta);
             stage.draw();
@@ -173,7 +174,7 @@ public class GameScreen implements Screen {
         // check if we need to create a new raindrop
         if(!pauze) {
             if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){pauze=false;}
-            rainMusic.play();
+            setMusic.play();
             if (TimeUtils.nanoTime() - lastDropTime > 1000000000)
                 spawnRaindrop();
 
@@ -212,7 +213,7 @@ public class GameScreen implements Screen {
     public void show() {
         // start the playback of the background music
         // when the screen is shown
-        rainMusic.play();
+        setMusic.play();
     }
 
     @Override
@@ -239,5 +240,7 @@ public class GameScreen implements Screen {
         bucketImage.dispose();
         dropSound.dispose();
         rainMusic.dispose();
+        stormTheme.dispose();
+        setMusic.dispose();
     }
 }
