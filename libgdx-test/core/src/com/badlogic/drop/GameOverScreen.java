@@ -28,9 +28,13 @@ public class GameOverScreen implements Screen {
     public GameOverScreen(final Drop game, int points) {
         this.game = game;
         this.points = points;
-        ArrayList<ArrayList<String>> playerid =Database.query(String.format("SELECT id FROM namen WHERE gebruikersnaam='%s'", game.screen.username));
 
-        Database.query(String.format("INSERT INTO highscore VALUES (%s,%s)",points,playerid.get(0).get(0)));
+        //ArrayList<ArrayList<String>> playerid =Database.query(String.format("SELECT id FROM namen WHERE gebruikersnaam='%s'", game.screen.username));
+        ArrayList<ArrayList<String>> playerid = QueryRepository.selectidfromname(game.screen.username);
+
+        //Database.query(String.format("INSERT INTO highscore VALUES (%s,%s)",points,playerid.get(0).get(0)));
+        QueryRepository.inserthighscore(points,playerid.get(0).get(0));
+
         System.out.println(playerid.get(0).get(0));
         titleStyle = new Label.LabelStyle();
         titleStyle.font = new BitmapFont(Gdx.files.internal("font/font-title-export.fnt"));
