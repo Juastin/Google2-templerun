@@ -3,6 +3,7 @@ package com.badlogic.drop;
 import java.io.IOException;
 import java.util.Iterator;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -20,6 +21,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
+import org.graalvm.compiler.debug.CSVUtil;
 
 public class GameScreen implements Screen {
     final Drop game;
@@ -148,7 +150,7 @@ public class GameScreen implements Screen {
 
         if(game.screen.input.contains("left") || game.screen.input.contains("A")) bucket.x -= 800 * Gdx.graphics.getDeltaTime();
         if(game.screen.input.contains("right") || game.screen.input.contains("D")) bucket.x += 800 * Gdx.graphics.getDeltaTime();
-        if(game.screen.input.contains("middle")){pauze=true;}
+        if(game.screen.input.contains("middle") || Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){pauze=true;}
 
         game.screen.input = "";
 

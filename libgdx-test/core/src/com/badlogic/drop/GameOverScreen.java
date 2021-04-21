@@ -42,7 +42,8 @@ public class GameOverScreen implements Screen {
             String stringscore = String.valueOf(s.get(0));
             String id = String.valueOf(s.get(1));
             ArrayList<ArrayList<String>> query2 =Database.query(String.format("SELECT gebruikersnaam FROM namen WHERE id=%s", id));
-            naam = new Label(String.valueOf(query2),skin);
+
+            naam = new Label(String.valueOf(query2.get(0).get(0)),skin);
             naam.setPosition(300,hoogte);
             score = new Label(String.valueOf(stringscore),skin);
             score.setPosition(100,hoogte);
