@@ -1,24 +1,19 @@
 package com.badlogic.drop;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.util.Iterator;
 
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.fazecast.jSerialComm.*;
-import arduino.*;
-import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
@@ -38,6 +33,9 @@ public class GameScreen implements Screen {
     Array<Rectangle> raindrops;
     long lastDropTime;
     int dropsGathered;
+    private boolean pauze=false;
+    private Stage stage;
+    private TextButton con;
 
     public GameScreen(final Drop game) {
         this.game = game;
@@ -67,6 +65,19 @@ public class GameScreen implements Screen {
         raindrops = new Array<Rectangle>();
         spawnRaindrop();
 
+        stage = new Stage();
+        Gdx.input.setInputProcessor(stage);
+        Skin skin = new Skin(Gdx.files.internal("skin/craftacular-ui.json"));
+        con = new TextButton("Continue",skin);
+        con.setPosition(200,80);
+        stage.addActor(con);
+        con.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                change();
+            }
+        });
+
     }
 
     private void spawnRaindrop() {
@@ -78,6 +89,7 @@ public class GameScreen implements Screen {
         raindrops.add(raindrop);
         lastDropTime = TimeUtils.nanoTime();
     }
+
 
     @Override
     public void render(float delta) {
@@ -94,7 +106,12 @@ public class GameScreen implements Screen {
         } else {
             game.screen.input = game.screen.previousinput;
         }
+
+        if(game.screen.input.contains("left")||game.screen.input.contains("right")){pauze=false;}
+
+
         game.screen.sleep++;
+
 
 
         // clear the screen with a dark blue color. The
@@ -120,6 +137,7 @@ public class GameScreen implements Screen {
         }
         game.batch.end();
 
+
         // process user input
         if (Gdx.input.isTouched()) {
             Vector3 touchPos = new Vector3();
@@ -127,10 +145,20 @@ public class GameScreen implements Screen {
             camera.unproject(touchPos);
             bucket.x = touchPos.x - 64 / 2;
         }
-        if(game.screen.input.contains("left") || game.screen.input.contains("A")) bucket.x -= 400 * Gdx.graphics.getDeltaTime();
-        if(game.screen.input.contains("right") || game.screen.input.contains("D")) bucket.x += 400 * Gdx.graphics.getDeltaTime();
-        game.screen.previousinput = game.screen.input;
+
+        if(game.screen.input.contains("left") || game.screen.input.contains("A")) bucket.x -= 800 * Gdx.graphics.getDeltaTime();
+        if(game.screen.input.contains("right") || game.screen.input.contains("D")) bucket.x += 800 * Gdx.graphics.getDeltaTime();
+        if(game.screen.input.contains("middle")){pauze=true;}
+
         game.screen.input = "";
+
+        if(pauze){
+            rainMusic.pause();
+            con.setVisible(true);
+            stage.act(delta);
+            stage.draw();
+        }
+
 
         // make sure the bucket stays within the screen bounds
         if (bucket.x < 0)
@@ -139,28 +167,40 @@ public class GameScreen implements Screen {
             bucket.x = 800 - 64;
 
         // check if we need to create a new raindrop
-        if (TimeUtils.nanoTime() - lastDropTime > 1000000000)
-            spawnRaindrop();
+        if(!pauze) {
+            rainMusic.play();
+            if (TimeUtils.nanoTime() - lastDropTime > 1000000000)
+                spawnRaindrop();
 
-        // move the raindrops, remove any that are beneath the bottom edge of
-        // the screen or that hit the bucket. In the later case we increase the
-        // value our drops counter and add a sound effect.
-        Iterator<Rectangle> iter = raindrops.iterator();
-        while (iter.hasNext()) {
-            Rectangle raindrop = iter.next();
-            raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
-            if (raindrop.y < 0) {
-                game.setScreen(new GameOverScreen(game, dropsGathered));
-                dispose();
-            }
-            if (raindrop.y + 64 < 0)
-                iter.remove();
-            if (raindrop.overlaps(bucket)) {
-                dropsGathered++;
-                dropSound.play();
-                iter.remove();
+            // move the raindrops, remove any that are beneath the bottom edge of
+            // the screen or that hit the bucket. In the later case we increase the
+            // value our drops counter and add a sound effect.
+            Iterator<Rectangle> iter = raindrops.iterator();
+            while (iter.hasNext()) {
+                Rectangle raindrop = iter.next();
+                if (Gdx.graphics.getDeltaTime() > 0.3) {
+                    System.out.println("niets");
+                } else {
+                    raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
+                }
+
+                if (raindrop.y < 0) {
+                    game.setScreen(new GameOverScreen(game, dropsGathered));
+                    dispose();
+                }
+                if (raindrop.y + 64 < 0)
+                    iter.remove();
+                if (raindrop.overlaps(bucket)) {
+                    dropsGathered++;
+                    dropSound.play();
+                    iter.remove();
+                }
             }
         }
+    }
+
+    public void change(){
+        pauze=false;
     }
 
     @Override
@@ -175,12 +215,14 @@ public class GameScreen implements Screen {
     }
 
     @Override
-    public void hide() {
+    public void pause() {
+
     }
 
     @Override
-    public void pause() {
+    public void hide() {
     }
+
 
     @Override
     public void resume() {
