@@ -79,8 +79,6 @@ public class GameOverScreen implements Screen {
             stage.addActor(label);
             stage.addActor(gameover);
 
-            System.out.println(stage.getWidth() / 2 - naam.getWidth()/2);
-
             hoogte=hoogte-25;
         }
         restart = new TextButton("restart",skin);

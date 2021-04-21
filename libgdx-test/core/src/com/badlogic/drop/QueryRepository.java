@@ -25,7 +25,14 @@ public class QueryRepository {
     public static ArrayList<ArrayList<String>> selectidfromname(String username) {
         try {
             PreparedStatement myStmt = verbinding.prepareStatement("SELECT id FROM namen WHERE gebruikersnaam=?");
-            myStmt.setString(1,username);
+            myStmt.setString(1, username);
+            ArrayList<ArrayList<String>> results = Database.query(myStmt);
+            return results;
+        } catch (Exception e) {
+            System.out.println("Fout met ophalen van id van naam");
+            return null;
+        }
+    }
 
     public static ArrayList<ArrayList<String>> getTopTen() {
         try {
@@ -40,7 +47,7 @@ public class QueryRepository {
     }
 
 
-    public static void inserthighscore(int punten,String playerid){
+    public static void inserthighscore(int punten,String playerid) {
         try {
             PreparedStatement myStmt = verbinding.prepareStatement("INSERT INTO highscore VALUES (?,?)");
             myStmt.setInt(1, punten);
@@ -48,6 +55,8 @@ public class QueryRepository {
             Database.query(myStmt);
         } catch (Exception e) {
             System.out.println("Fout met opslaan naam");
+        }
+    }
 
     public static ArrayList<ArrayList<String>> getUsername(int id) {
         try {
@@ -58,7 +67,6 @@ public class QueryRepository {
         } catch (Exception e) {
             System.out.println("Fout met ophalen van leaderboard");
             return null;
-
         }
     }
 }
