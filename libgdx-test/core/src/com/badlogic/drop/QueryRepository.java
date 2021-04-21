@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class QueryRepository {
     static Connection verbinding = Database.maakVerbinding();
@@ -17,6 +18,29 @@ public class QueryRepository {
             Database.query(myStmt);
         } catch (Exception e) {
             System.out.println("Fout met opslaan naam");
+        }
+    }
+
+    public static ArrayList<ArrayList<String>> getTopTen() {
+        try {
+            PreparedStatement myStmt = verbinding.prepareStatement("SELECT score, playerID FROM highscore ORDER BY SCORE DESC LIMIT 10");
+            ArrayList<ArrayList<String>> results = Database.query(myStmt);
+            return results;
+        } catch (Exception e) {
+            System.out.println("Fout met ophalen van leaderboard");
+            return null;
+        }
+    }
+
+    public static ArrayList<ArrayList<String>> getUsername(int id) {
+        try {
+            PreparedStatement myStmt = verbinding.prepareStatement("SELECT gebruikersnaam FROM namen WHERE id=?");
+            myStmt.setInt(1, id);
+            ArrayList<ArrayList<String>> results = Database.query(myStmt);
+            return results;
+        } catch (Exception e) {
+            System.out.println("Fout met ophalen van leaderboard");
+            return null;
         }
     }
 }

@@ -29,6 +29,7 @@ public class GameOverScreen implements Screen {
         this.game = game;
         this.points = points;
         ArrayList<ArrayList<String>> playerid =Database.query(String.format("SELECT id FROM namen WHERE gebruikersnaam='%s'", game.screen.username));
+
         Database.query(String.format("INSERT INTO highscore VALUES (%s,%s)",points,playerid.get(0).get(0)));
         System.out.println(playerid.get(0).get(0));
         titleStyle = new Label.LabelStyle();
@@ -36,7 +37,7 @@ public class GameOverScreen implements Screen {
 
 
         //weergeeft de scores
-        ArrayList<ArrayList<String>> query = Database.query("SELECT score, playerID FROM highscore ORDER BY SCORE DESC LIMIT 10");
+        ArrayList<ArrayList<String>> query = QueryRepository.getTopTen();
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
         Skin skin = new Skin(Gdx.files.internal("skin/craftacular-ui.json"));
@@ -57,7 +58,7 @@ public class GameOverScreen implements Screen {
         for (ArrayList<String> s:query) {
             String stringscore = String.valueOf(s.get(0));
             String id = String.valueOf(s.get(1));
-            ArrayList<ArrayList<String>> query2 =Database.query(String.format("SELECT gebruikersnaam FROM namen WHERE id=%s", id));
+            ArrayList<ArrayList<String>> query2 = QueryRepository.getUsername(Integer.parseInt(id));
 
 
             Label gameover = new Label("Gameover",titleStyle);
