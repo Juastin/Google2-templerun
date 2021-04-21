@@ -60,7 +60,7 @@ public class GameScreen implements Screen {
         // load the drop sound effect and the rain background "music"
         dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
         rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
-        stormTheme = Gdx.audio.newMusic(Gdx.files.internal("Google2_-_Temple_Run_Original_Theme.mp3"));
+        stormTheme = Gdx.audio.newMusic(Gdx.files.internal("templerun_loop.mp3"));
         setMusic = stormTheme;
         setMusic.setLooping(true);
 
