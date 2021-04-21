@@ -70,6 +70,7 @@ public class GameOverScreen implements Screen {
         ScreenUtils.clear(0, 0, 0.2f, 1);
         stage.act(delta);
         stage.draw();
+
     }
 
     @Override

@@ -94,14 +94,23 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         //Ophalen button data van Raspberry Pi
-        try {
-            game.screen.mySocket.setSoTimeout(1);
-            game.screen.mySocket.receive(game.screen.packet);
-            String message = new String(game.screen.buffer);
-            game.screen.input = message;
-        } catch (IOException ignored) {
+        if (game.screen.sleep == 3) {
+            try {
+                game.screen.mySocket.setSoTimeout(1);
+                game.screen.mySocket.receive(game.screen.packet);
+                String message = new String(game.screen.buffer);
+                game.screen.input = message;
+            } catch (IOException ignored) {
+            }
+            game.screen.sleep = 0;
+        } else {
+            game.screen.input = game.screen.previousinput;
         }
+
         if(game.screen.input.contains("left")||game.screen.input.contains("right")){pauze=false;}
+
+
+        game.screen.sleep++;
 
 
 
@@ -121,7 +130,7 @@ public class GameScreen implements Screen {
         // begin a new batch and draw the bucket and
         // all drops
         game.batch.begin();
-        game.font.draw(game.batch, "Drops Collected: " + dropsGathered, 0, 480);
+        game.font.draw(game.batch, "Drops Collected: " + dropsGathered, 10, 470);
         game.batch.draw(bucketImage, bucket.x, bucket.y, bucket.width, bucket.height);
         for (Rectangle raindrop : raindrops) {
             game.batch.draw(dropImage, raindrop.x, raindrop.y);
@@ -136,9 +145,11 @@ public class GameScreen implements Screen {
             camera.unproject(touchPos);
             bucket.x = touchPos.x - 64 / 2;
         }
+
         if(game.screen.input.contains("left") || game.screen.input.contains("A")) bucket.x -= 800 * Gdx.graphics.getDeltaTime();
         if(game.screen.input.contains("right") || game.screen.input.contains("D")) bucket.x += 800 * Gdx.graphics.getDeltaTime();
         if(game.screen.input.contains("middle")){pauze=true;}
+
         game.screen.input = "";
 
         if(pauze){

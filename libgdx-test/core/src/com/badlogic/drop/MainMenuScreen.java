@@ -3,8 +3,10 @@ package com.badlogic.drop;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.loaders.AssetLoader;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -25,12 +27,17 @@ import java.util.ArrayList;
 public class MainMenuScreen implements Screen {
     final Drop game;
 
+    private Label.LabelStyle titleStyle;
+
+    private Label lTitle;
     private TextField tfUsername;
     private Label lUsername;
     private TextButton tbStart;
     private Stage stage;
+    public Skin skin;
+    Sound menuClick;
 
-    String username;
+    public String username;
 
     //Connectie voor Arduino
     private long diff, start = System.currentTimeMillis();
@@ -43,6 +50,8 @@ public class MainMenuScreen implements Screen {
     DatagramSocket mySocket;
     byte[] buffer;
     DatagramPacket packet;
+    int sleep = 0;
+    String previousinput = "";
 
     public MainMenuScreen(final Drop game) {
         this.game = game;
@@ -71,11 +80,18 @@ public class MainMenuScreen implements Screen {
             }
         });
 
+        menuClick = Gdx.audio.newSound(Gdx.files.internal("minecraft_click.mp3"));
+
+        titleStyle = new Label.LabelStyle();
+        titleStyle.font = new BitmapFont(Gdx.files.internal("font/font-title-export.fnt"));
+
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
-        Skin skin = new Skin(Gdx.files.internal("skin/craftacular-ui.json"));
+        skin = new Skin(Gdx.files.internal("skin/craftacular-ui.json"));
 
         //Maken onderdelen voor scherm
+        lTitle = new Label("Temple Run",titleStyle);
+        lTitle.setPosition(stage.getWidth()/2 - lTitle.getWidth()/2,350);
         lUsername = new Label("Enter username:", skin);
         lUsername.setPosition(stage.getWidth() / 2 - lUsername.getWidth()/2, stage.getHeight() / 2 - lUsername.getHeight()/2+50);
         tfUsername = new TextField("", skin);
@@ -86,6 +102,7 @@ public class MainMenuScreen implements Screen {
         tbStart.setPosition(stage.getWidth() / 2 - tbStart.getWidth()/2, stage.getHeight() / 2 - tbStart.getHeight()/2-70);
 
         //Toevoegen onderdelen aan scherm
+        stage.addActor(lTitle);
         stage.addActor(tfUsername);
         stage.addActor(lUsername);
         stage.addActor(tbStart);
@@ -100,15 +117,20 @@ public class MainMenuScreen implements Screen {
     }
 
     public void tbStartClicked() {
-        username = tfUsername.getText();
-        Database.query(String.format("insert into namen (gebruikersnaam) Select '%s' Where not exists(select * from namen where gebruikersnaam='%s')", username, username));
+        menuClick.play();
+        if (!tfUsername.getText().equals("")) {
+            username = tfUsername.getText();
+        } else {
+            username = "Gastgebruiker";
+        }
+        QueryRepository.insertName(username);
         System.out.println("player: " + username);
         game.setScreen(new GameScreen(game));
         dispose();
     }
 
     public void render(float delta) {
-        ScreenUtils.clear(94/255f, 51/255f, 30/255f, 1);
+        ScreenUtils.clear(60/255f, 30/255f, 30/255f, 1);
         stage.act(delta);
         stage.draw();
     }
