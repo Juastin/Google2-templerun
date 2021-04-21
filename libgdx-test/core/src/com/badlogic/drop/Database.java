@@ -23,16 +23,24 @@ public class Database {
     static String username = "root";
     static String password = "";
 
-    public static ArrayList<ArrayList<String>> query(String query) {
+    public static Connection maakVerbinding() {
+        try {
+            Connection myConn = DriverManager.getConnection(Database.host, Database.username, Database.password);
+            return myConn;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println(ex);
+            return null;
+        }
+    }
+
+    public static ArrayList<ArrayList<String>> query(PreparedStatement myStmt) {
         ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
         Connection myConn = null;
-        Statement myStmt = null;
         ResultSet myRs = null;
 
         try {
-            myConn = DriverManager.getConnection(Database.host, Database.username, Database.password);
-            myStmt = myConn.createStatement();
-            myRs = myStmt.executeQuery(query);
+            myRs = myStmt.executeQuery();
             ResultSetMetaData rsmd = myRs.getMetaData();
             int columnsNumber = rsmd.getColumnCount();
 
