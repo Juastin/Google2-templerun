@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
@@ -53,7 +54,7 @@ public class MainMenuScreen implements Screen {
     int sleep = 0;
     String previousinput = "";
 
-    public MainMenuScreen(final Drop game) {
+    public MainMenuScreen(final Drop game, String name) {
         this.game = game;
 
         //Socket connectie maken via ssh met Raspberry Pi
@@ -94,7 +95,12 @@ public class MainMenuScreen implements Screen {
         lTitle.setPosition(stage.getWidth()/2 - lTitle.getWidth()/2,350);
         lUsername = new Label("Enter username:", skin);
         lUsername.setPosition(stage.getWidth() / 2 - lUsername.getWidth()/2, stage.getHeight() / 2 - lUsername.getHeight()/2+50);
-        tfUsername = new TextField("", skin);
+        if (name != null) {
+            tfUsername = new TextField(name, skin);
+            tfUsername.setTouchable(Touchable.disabled);
+        } else {
+            tfUsername = new TextField("", skin);
+        }
         tfUsername.setSize(500, 60);
         tfUsername.setPosition(stage.getWidth() / 2 - tfUsername.getWidth()/2, stage.getHeight() / 2 - tfUsername.getHeight()/2);
         tbStart = new TextButton("Play", skin);
