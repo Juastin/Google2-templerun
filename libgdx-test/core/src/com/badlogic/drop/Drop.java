@@ -11,6 +11,14 @@ public class Drop extends Game {
     public SpriteBatch batch;
     public BitmapFont font;
     public MainMenuScreen screen;
+    private String name;
+
+    public Drop () {
+        this.name = null;
+    }
+    public Drop (String name) {
+        this.name = name;
+    }
 
     public void create() {
         batch = new SpriteBatch();
@@ -18,7 +26,7 @@ public class Drop extends Game {
                 Gdx.files.internal( "font/font-export.fnt" ),
                 Gdx.files.internal( "font/font-export.png" ),
                 false ); // use libGDX's default Arial font
-        screen = new MainMenuScreen(this);
+        screen = new MainMenuScreen(this, name);
         this.setScreen(screen);
     }
 

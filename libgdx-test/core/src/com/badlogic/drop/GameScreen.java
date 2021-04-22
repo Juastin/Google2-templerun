@@ -26,8 +26,13 @@ import org.graalvm.compiler.debug.CSVUtil;
 public class GameScreen implements Screen {
     final Drop game;
 
+    Texture setPlayer;
+    Texture setObject;
+
     Texture dropImage;
     Texture bucketImage;
+    Texture virus;
+    Texture emoji;
     Sound dropSound;
     Music rainMusic;
     Music stormTheme;
@@ -56,12 +61,17 @@ public class GameScreen implements Screen {
         // load the images for the droplet and the bucket, 64x64 pixels each
         dropImage = new Texture(Gdx.files.internal("drop.png"));
         bucketImage = new Texture(Gdx.files.internal("bucket.png"));
+        virus = new Texture(Gdx.files.internal("corona.png"));
+        emoji = new Texture(Gdx.files.internal("emoji.png"));
 
         // load the drop sound effect and the rain background "music"
         dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
         rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
         stormTheme = Gdx.audio.newMusic(Gdx.files.internal("templerun_loop.mp3"));
+        
         setMusic = stormTheme;
+        setObject = dropImage;
+        setPlayer = bucketImage;
         setMusic.setLooping(true);
 
         // create the camera and the SpriteBatch
@@ -191,20 +201,21 @@ public class GameScreen implements Screen {
         // all drops
         game.batch.begin();
         game.font.draw(game.batch, "Drops Collected: " + dropsGathered, 10, 470);
-        game.batch.draw(bucketImage, bucket.x, bucket.y, bucket.width, bucket.height);
+        game.batch.draw(setPlayer, bucket.x, bucket.y, bucket.width, bucket.height);
         for (Rectangle raindrop : raindrops) {
-            game.batch.draw(dropImage, raindrop.x, raindrop.y);
+            game.batch.draw(setObject, raindrop.x, raindrop.y, 64, 64);
         }
         game.batch.end();
 
 
-
-        // process user input
-        if (Gdx.input.isTouched()) {
-            Vector3 touchPos = new Vector3();
-            touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            camera.unproject(touchPos);
-            bucket.x = touchPos.x - 64 / 2;
+        if(!pauze) {
+            // process user input
+            if (Gdx.input.isTouched()) {
+                Vector3 touchPos = new Vector3();
+                touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+                camera.unproject(touchPos);
+                bucket.x = touchPos.x - 64 / 2;
+            }
         }
 
         if(game.screen.input.contains("left") || game.screen.input.contains("A")) bucket.x -= 800 * Gdx.graphics.getDeltaTime();
@@ -248,22 +259,17 @@ public class GameScreen implements Screen {
             Iterator<Rectangle> iter = raindrops.iterator();
             while (iter.hasNext()) {
                 Rectangle raindrop = iter.next();
-                if (Gdx.graphics.getDeltaTime() > 0.3) {
-                    System.out.println("niets");
-                } else {
-                    raindrop.y -= difficulty.getValue() * Gdx.graphics.getDeltaTime();
-                }
+                raindrop.y -= difficulty.getValue() * Gdx.graphics.getDeltaTime();
 
-                if (raindrop.y < 0) {
-                    game.setScreen(new GameOverScreen(game, dropsGathered));
-                    dispose();
-                }
-                if (raindrop.y + 64 < 0)
+                if (raindrop.y + 64 < 0) {
                     iter.remove();
-                if (raindrop.overlaps(bucket)) {
                     dropsGathered++;
+                }
+                if (raindrop.overlaps(bucket)) {
+                    game.setScreen(new GameOverScreen(game, dropsGathered));
                     dropSound.play();
                     iter.remove();
+                    dispose();
                 }
             }
         }

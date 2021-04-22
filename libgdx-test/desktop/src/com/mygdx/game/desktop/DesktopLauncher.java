@@ -12,7 +12,12 @@ public class DesktopLauncher {
 		config.title = "Drop";
 		config.width = 800;
 		config.height = 480;
-		new LwjglApplication(new Drop(), config);
+		try {
+			String name = arg[0];
+			new LwjglApplication(new Drop(name), config);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			new LwjglApplication(new Drop(), config);
+		}
 	}
 }
 
