@@ -249,11 +249,7 @@ public class GameScreen implements Screen {
             Iterator<Rectangle> iter = raindrops.iterator();
             while (iter.hasNext()) {
                 Rectangle raindrop = iter.next();
-                if (Gdx.graphics.getDeltaTime() > 0.3) {
-                    System.out.println("niets");
-                } else {
-                    raindrop.y -= difficulty.getValue() * Gdx.graphics.getDeltaTime();
-                }
+                raindrop.y -= difficulty.getValue() * Gdx.graphics.getDeltaTime();
 
                 if (raindrop.y < 0) {
                     game.setScreen(new GameOverScreen(game, dropsGathered));
