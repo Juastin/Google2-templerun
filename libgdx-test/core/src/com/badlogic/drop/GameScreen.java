@@ -59,19 +59,19 @@ public class GameScreen implements Screen {
         this.game = game;
 
         // load the images for the droplet and the bucket, 64x64 pixels each
-        dropImage = new Texture(Gdx.files.internal("drop.png"));
-        bucketImage = new Texture(Gdx.files.internal("bucket.png"));
-        virus = new Texture(Gdx.files.internal("corona.png"));
-        emoji = new Texture(Gdx.files.internal("emoji.png"));
+//        dropImage = new Texture(Gdx.files.internal("drop.png"));
+//        bucketImage = new Texture(Gdx.files.internal("bucket.png"));
+//        virus = new Texture(Gdx.files.internal("corona.png"));
+//        emoji = new Texture(Gdx.files.internal("emoji.png"));
 
         // load the drop sound effect and the rain background "music"
-        dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
-        rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
-        stormTheme = Gdx.audio.newMusic(Gdx.files.internal("templerun_loop.mp3"));
+//        dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
+//        rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
+//        stormTheme = Gdx.audio.newMusic(Gdx.files.internal("templerun_loop.mp3"));
         
-        setMusic = stormTheme;
-        setObject = virus;
-        setPlayer = emoji;
+        setMusic = Gdx.audio.newMusic(Gdx.files.internal("templerun_loop.mp3"));
+        setObject = new Texture(Gdx.files.internal("corona.png"));
+        setPlayer = new Texture(Gdx.files.internal("emoji.png"));
         setMusic.setLooping(true);
 
         // create the camera and the SpriteBatch
@@ -228,16 +228,7 @@ public class GameScreen implements Screen {
         game.screen.input = "";
 
         if(pauze){
-            setMusic.pause();
-            con.setVisible(true);
-            rwaarde.setVisible(true);
-            gwaarde.setVisible(true);
-            bwaarde.setVisible(true);
-            difficulty.setVisible(true);
-            moeilijkheid.setVisible(true);
-            rood.setVisible(true);
-            groen.setVisible(true);
-            blauw.setVisible(true);
+            showPause();
             stage.act(delta);
             stage.draw();
         }
@@ -269,7 +260,7 @@ public class GameScreen implements Screen {
                 }
                 if (raindrop.overlaps(bucket)) {
                     game.setScreen(new GameOverScreen(game, dropsGathered));
-                    dropSound.play();
+//                    dropSound.play();
                     iter.remove();
                     dispose();
                 }
@@ -277,8 +268,33 @@ public class GameScreen implements Screen {
         }
     }
 
+    public void showPause() {
+        setMusic.pause();
+        con.setVisible(true);
+        rwaarde.setVisible(true);
+        gwaarde.setVisible(true);
+        bwaarde.setVisible(true);
+        difficulty.setVisible(true);
+        moeilijkheid.setVisible(true);
+        rood.setVisible(true);
+        groen.setVisible(true);
+        blauw.setVisible(true);
+    }
+
     public void change(){
         pauze=false;
+    }
+
+    @Override
+    public void dispose() {
+//        dropImage.dispose();
+//        bucketImage.dispose();
+//        dropSound.dispose();
+//        rainMusic.dispose();
+//        stormTheme.dispose();
+        setMusic.dispose();
+        setObject.dispose();
+        setPlayer.dispose();
     }
 
     @Override
@@ -304,15 +320,5 @@ public class GameScreen implements Screen {
 
     @Override
     public void resume() {
-    }
-
-    @Override
-    public void dispose() {
-        dropImage.dispose();
-        bucketImage.dispose();
-        dropSound.dispose();
-        rainMusic.dispose();
-        stormTheme.dispose();
-        setMusic.dispose();
     }
 }

@@ -6,7 +6,11 @@ import com.badlogic.gdx.assets.loaders.AssetLoader;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -34,6 +38,7 @@ public class MainMenuScreen implements Screen {
     private TextField tfUsername;
     private Label lUsername;
     private TextButton tbStart;
+    private TextButton tbLeaderboard;
     private Stage stage;
     public Skin skin;
     Sound menuClick;
@@ -54,32 +59,55 @@ public class MainMenuScreen implements Screen {
     int sleep = 0;
     String previousinput = "";
 
+    OrthographicCamera camera;
+    private SpriteBatch batch;
+    ShaderProgram shader;
+    Texture transition;
+    float time = 0;
+    float addtime = 0.05f;
+    boolean doTrans;
+    TransitionRenders test;
+
     public MainMenuScreen(final Drop game, String name) {
         this.game = game;
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false, 800, 480);
+        batch = new SpriteBatch();
 
-        //Socket connectie maken via ssh met Raspberry Pi
-        try {
-            mySocket = new DatagramSocket(localPortNum);
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
-        buffer = new byte[MAX_LEN];
-        packet = new DatagramPacket(buffer, MAX_LEN);
-        comPort.openPort();
-        comPort.addDataListener(new SerialPortDataListener() {
-            @Override
-            public int getListeningEvents() { return SerialPort.LISTENING_EVENT_DATA_AVAILABLE; }
-            @Override
-            public void serialEvent(SerialPortEvent event) {
-                if (event.getEventType() != SerialPort.LISTENING_EVENT_DATA_AVAILABLE)
-                    return; else {
-                }
-                byte[] newData = new byte[comPort.bytesAvailable()];
-                int numRead = comPort.readBytes(newData, newData.length);
-                String result = new String(newData);
-                input = result;
+        //transition setup
+        shader = new ShaderProgram(batch.getShader().getVertexShaderSource(), Gdx.files.internal("Fragment.fsh").readString());
+        transition = new Texture(Gdx.files.internal("trans4.png"));
+
+        if (!game.connectAttempted) {
+            //Socket connectie maken via ssh met Raspberry Pi
+            try {
+                mySocket = new DatagramSocket(localPortNum);
+            } catch (SocketException e) {
+                e.printStackTrace();
             }
-        });
+            buffer = new byte[MAX_LEN];
+            packet = new DatagramPacket(buffer, MAX_LEN);
+            comPort.openPort();
+            comPort.addDataListener(new SerialPortDataListener() {
+                @Override
+                public int getListeningEvents() {
+                    return SerialPort.LISTENING_EVENT_DATA_AVAILABLE;
+                }
+
+                @Override
+                public void serialEvent(SerialPortEvent event) {
+                    if (event.getEventType() != SerialPort.LISTENING_EVENT_DATA_AVAILABLE)
+                        return;
+                    else {
+                    }
+                    byte[] newData = new byte[comPort.bytesAvailable()];
+                    int numRead = comPort.readBytes(newData, newData.length);
+                    String result = new String(newData);
+                    input = result;
+                }
+            });
+            game.connectAttempted = true;
+        }
 
         menuClick = Gdx.audio.newSound(Gdx.files.internal("minecraft_click.mp3"));
 
@@ -106,12 +134,16 @@ public class MainMenuScreen implements Screen {
         tbStart = new TextButton("Play", skin);
         tbStart.setSize(300, 60);
         tbStart.setPosition(stage.getWidth() / 2 - tbStart.getWidth()/2, stage.getHeight() / 2 - tbStart.getHeight()/2-70);
+        tbLeaderboard = new TextButton("Leaderboard", skin);
+        tbLeaderboard.setSize(300, 60);
+        tbLeaderboard.setPosition(stage.getWidth() / 2 - tbStart.getWidth()/2, stage.getHeight() / 2 - tbStart.getHeight()/2-140);
 
         //Toevoegen onderdelen aan scherm
         stage.addActor(lTitle);
         stage.addActor(tfUsername);
         stage.addActor(lUsername);
         stage.addActor(tbStart);
+        stage.addActor(tbLeaderboard);
 
         //Luisteren naar knop
         tbStart.addListener(new ClickListener() {
@@ -120,17 +152,26 @@ public class MainMenuScreen implements Screen {
                 tbStartClicked();
             }
         });
+
+        tbLeaderboard.addListener(new ClickListener() {
+            @Override
+            public void touchUp(InputEvent e, float x, float y, int point, int button) {
+                doTrans = true;
+                menuClick.play();
+                test= new TransitionRenders();
+            }
+        });
     }
 
     public void tbStartClicked() {
         menuClick.play();
         if (!tfUsername.getText().equals("")) {
-            username = tfUsername.getText();
+            game.screen.username = tfUsername.getText();
         } else {
-            username = "Gastgebruiker";
+            game.screen.username = "Gastgebruiker";
         }
-        QueryRepository.insertName(username);
-        System.out.println("player: " + username);
+        QueryRepository.insertName(game.screen.username);
+        System.out.println("player: " + game.screen.username);
         game.setScreen(new GameScreen(game));
         dispose();
     }
@@ -139,6 +180,16 @@ public class MainMenuScreen implements Screen {
         ScreenUtils.clear(60/255f, 30/255f, 30/255f, 1);
         stage.act(delta);
         stage.draw();
+
+        camera.update();
+        game.batch.setProjectionMatrix(camera.combined);
+        if (doTrans) {
+            test.transitionOut(batch, shader, transition);
+            if (test.time <= -1) {
+                game.setScreen(new LeaderboardScreen(game));
+                dispose();
+            }
+        }
     }
 
     @Override

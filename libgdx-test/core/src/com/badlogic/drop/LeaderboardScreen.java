@@ -10,34 +10,23 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
+
 import java.util.ArrayList;
 
-public class GameOverScreen implements Screen {
+public class LeaderboardScreen implements Screen {
 
     final Drop game;
-    int points;
     private Stage stage;
     private Label score;
     private int hoogte=300;
     private Label naam;
-    private TextButton restart;
+    private TextButton Done;
     private int cijfer=1;
     private Label.LabelStyle titleStyle;
 
 
-    public GameOverScreen(final Drop game, int points) {
+    public LeaderboardScreen(final Drop game) {
         this.game = game;
-        this.points = points;
-
-        //ArrayList<ArrayList<String>> playerid =Database.query(String.format("SELECT id FROM namen WHERE gebruikersnaam='%s'", game.screen.username));
-        ArrayList<ArrayList<String>> playerid = QueryRepository.selectidfromname(game.screen.username);
-
-        //Database.query(String.format("INSERT INTO highscore VALUES (%s,%s)",points,playerid.get(0).get(0)));
-        try {
-            QueryRepository.inserthighscore(points, playerid.get(0).get(0));
-        } catch (IndexOutOfBoundsException e) {
-            System.out.println(e);
-        }
 
         titleStyle = new Label.LabelStyle();
         titleStyle.font = new BitmapFont(Gdx.files.internal("font/font-title-export.fnt"));
@@ -68,7 +57,7 @@ public class GameOverScreen implements Screen {
             ArrayList<ArrayList<String>> query2 = QueryRepository.getUsername(Integer.parseInt(id));
 
 
-            Label gameover = new Label("Gameover",titleStyle);
+            Label gameover = new Label("Leaderboard",titleStyle);
             gameover.setPosition(stage.getWidth() / 2 - gameover.getWidth()/2,370);
             naam = new Label(String.valueOf(query2.get(0).get(0)),skin);
             Label label = new Label(String.valueOf(cijfer+"."),skin);
@@ -84,11 +73,11 @@ public class GameOverScreen implements Screen {
 
             hoogte=hoogte-25;
         }
-        restart = new TextButton("restart",skin);
-        restart.setPosition(stage.getWidth() / 2 - restart.getWidth()/2,10);
-        stage.addActor(restart);
+        Done = new TextButton("Done",skin);
+        Done.setPosition(stage.getWidth() / 2 - Done.getWidth()/2,10);
+        stage.addActor(Done);
 
-        restart.addListener(new ClickListener() {
+        Done.addListener(new ClickListener() {
             @Override
             public void touchUp(InputEvent e, float x, float y, int point, int button) {
                 tbStartClicked();
@@ -98,9 +87,7 @@ public class GameOverScreen implements Screen {
     }
 
     public void tbStartClicked() {
-        game.setScreen(new GameScreen(game));
-        game.screen.menuClick.play();
-        dispose();
+        game.setScreen(new MainMenuScreen(game, game.name));
     }
 
     public void render(float delta) {
