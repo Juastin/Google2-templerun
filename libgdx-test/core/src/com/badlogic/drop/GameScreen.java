@@ -70,8 +70,8 @@ public class GameScreen implements Screen {
         stormTheme = Gdx.audio.newMusic(Gdx.files.internal("templerun_loop.mp3"));
         
         setMusic = stormTheme;
-        setObject = dropImage;
-        setPlayer = bucketImage;
+        setObject = virus;
+        setPlayer = emoji;
         setMusic.setLooping(true);
 
         // create the camera and the SpriteBatch
@@ -143,8 +143,10 @@ public class GameScreen implements Screen {
         con.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                change();
-                game.screen.menuClick.play();
+                if (pauze) {
+                    change();
+                    game.screen.menuClick.play();
+                }
             }
         });
 
@@ -250,7 +252,7 @@ public class GameScreen implements Screen {
         if(!pauze) {
             if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){pauze=false;}
             setMusic.play();
-            if (TimeUtils.nanoTime() - lastDropTime > 1000000000)
+            if (TimeUtils.nanoTime() - lastDropTime > 1000000000 - (difficulty.getValue() + Math.min(dropsGathered, 200) * 3000000))
                 spawnRaindrop();
 
             // move the raindrops, remove any that are beneath the bottom edge of
@@ -259,7 +261,7 @@ public class GameScreen implements Screen {
             Iterator<Rectangle> iter = raindrops.iterator();
             while (iter.hasNext()) {
                 Rectangle raindrop = iter.next();
-                raindrop.y -= difficulty.getValue() * Gdx.graphics.getDeltaTime();
+                raindrop.y -= (difficulty.getValue() + dropsGathered * 4) * Gdx.graphics.getDeltaTime();
 
                 if (raindrop.y + 64 < 0) {
                     iter.remove();
