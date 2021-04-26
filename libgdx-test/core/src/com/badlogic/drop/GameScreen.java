@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -27,7 +28,7 @@ public class GameScreen implements Screen {
     final Drop game;
 
     Texture setPlayer;
-    Texture setObject;
+    Texture[] setObject = new Texture[5];
 
     Texture dropImage;
     Texture bucketImage;
@@ -40,6 +41,7 @@ public class GameScreen implements Screen {
     OrthographicCamera camera;
     Rectangle bucket;
     Array<Rectangle> raindrops;
+    Array<Integer> carColor;
     long lastDropTime;
     int dropsGathered;
     private boolean pauze=false;
@@ -53,6 +55,10 @@ public class GameScreen implements Screen {
     private Label rood;
     private Label groen;
     private Label blauw;
+
+    private Texture background;
+    int backgroundoffset = 0;
+    TextureRegion[] playerMove = new TextureRegion[2];
 
 
     public GameScreen(final Drop game) {
@@ -68,10 +74,23 @@ public class GameScreen implements Screen {
 //        dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
 //        rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
 //        stormTheme = Gdx.audio.newMusic(Gdx.files.internal("templerun_loop.mp3"));
-        
+
+        //m
         setMusic = Gdx.audio.newMusic(Gdx.files.internal("templerun_loop.mp3"));
-        setObject = new Texture(Gdx.files.internal("corona.png"));
-        setPlayer = new Texture(Gdx.files.internal("emoji.png"));
+        setObject[0] = new Texture(Gdx.files.internal("car1.png"));
+        setObject[1] = new Texture(Gdx.files.internal("car2.png"));
+        setObject[2] = new Texture(Gdx.files.internal("car3.png"));
+        setObject[3] = new Texture(Gdx.files.internal("car4.png"));
+        setObject[4] = new Texture(Gdx.files.internal("car5.png"));
+        setPlayer = new Texture(Gdx.files.internal("pixil-frame-0 (1).png"));
+
+        //player left and right texture
+//        playerMove[0] = new TextureRegion(new Texture("pixil-frame-0.png"));
+//        playerMove[1] = new TextureRegion(new Texture("pixil-frame-0.png"));
+//        playerMove[1].flip(true, false);
+
+
+        background = new Texture("road.png");
         setMusic.setLooping(true);
 
         // create the camera and the SpriteBatch
@@ -88,6 +107,7 @@ public class GameScreen implements Screen {
 
         // create the raindrops array and spawn the first raindrop
         raindrops = new Array<Rectangle>();
+        carColor = new Array<Integer>();
         spawnRaindrop();
 
         stage = new Stage();
@@ -111,8 +131,6 @@ public class GameScreen implements Screen {
         gwaarde = new Slider(0,255,1,false,skin);
         bwaarde = new Slider(0,255,1,false,skin);
 
-
-
         con.setPosition(200,80);
         difficulty.setPosition(400,400);
         rwaarde.setPosition(200,400);
@@ -128,7 +146,6 @@ public class GameScreen implements Screen {
         rwaarde.setValue(0);
         gwaarde.setValue(0);
         bwaarde.setValue(51);
-
 
         stage.addActor(difficulty);
         stage.addActor(moeilijkheid);
@@ -157,11 +174,12 @@ public class GameScreen implements Screen {
         raindrop.x = MathUtils.random(0, 800 - 64);
         raindrop.y = 480;
         raindrop.width = 64;
-        raindrop.height = 64;
+        raindrop.height = 105;
         raindrops.add(raindrop);
         lastDropTime = TimeUtils.nanoTime();
+        int car = (int) (Math.floor(Math.random() * 5));
+        carColor.add(car);
     }
-
 
     @Override
     public void render(float delta) {
@@ -202,15 +220,23 @@ public class GameScreen implements Screen {
         // begin a new batch and draw the bucket and
         // all drops
         game.batch.begin();
-        game.font.draw(game.batch, "Drops Collected: " + dropsGathered, 10, 470);
+        if (backgroundoffset == -480) {
+            backgroundoffset = 0;
+        }
+        game.batch.draw(background, 0, backgroundoffset+480, 800, 480);
+        game.batch.draw(background, 0, backgroundoffset, 800, 480);
+        game.font.draw(game.batch, "Points: " + dropsGathered, 10, 470);
         game.batch.draw(setPlayer, bucket.x, bucket.y, bucket.width, bucket.height);
+        int count = 0;
         for (Rectangle raindrop : raindrops) {
-            game.batch.draw(setObject, raindrop.x, raindrop.y, 64, 64);
+            game.batch.draw(setObject[carColor.get(count)], raindrop.x, raindrop.y, 64, 105);
+            count++;
         }
         game.batch.end();
 
 
         if(!pauze) {
+            backgroundoffset-= 1;
             // process user input
             if (Gdx.input.isTouched()) {
                 Vector3 touchPos = new Vector3();
@@ -220,7 +246,9 @@ public class GameScreen implements Screen {
             }
         }
 
-        if(game.screen.input.contains("left") || game.screen.input.contains("A")) bucket.x -= 800 * Gdx.graphics.getDeltaTime();
+        if(game.screen.input.contains("left") || game.screen.input.contains("A")) {
+            bucket.x -= 800 * Gdx.graphics.getDeltaTime();
+        }
         if(game.screen.input.contains("right") || game.screen.input.contains("D")) bucket.x += 800 * Gdx.graphics.getDeltaTime();
         if(game.screen.input.contains("middle") || Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){pauze=true;}
         game.screen.previousinput = game.screen.input;
@@ -243,7 +271,7 @@ public class GameScreen implements Screen {
         if(!pauze) {
             if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){pauze=false;}
             setMusic.play();
-            if (TimeUtils.nanoTime() - lastDropTime > 1000000000 - (difficulty.getValue() + Math.min(dropsGathered, 200) * 3000000))
+            if (TimeUtils.nanoTime() - lastDropTime > 1500000000 - (difficulty.getValue() + Math.min(dropsGathered, 200) * 3000000))
                 spawnRaindrop();
 
             // move the raindrops, remove any that are beneath the bottom edge of
@@ -254,15 +282,17 @@ public class GameScreen implements Screen {
                 Rectangle raindrop = iter.next();
                 raindrop.y -= (difficulty.getValue() + dropsGathered * 4) * Gdx.graphics.getDeltaTime();
 
-                if (raindrop.y + 64 < 0) {
+                if (raindrop.y + 105 < 0) {
                     iter.remove();
+                    carColor.removeIndex(0);
                     dropsGathered++;
                 }
                 if (raindrop.overlaps(bucket)) {
+                    dispose();
                     game.setScreen(new GameOverScreen(game, dropsGathered));
 //                    dropSound.play();
                     iter.remove();
-                    dispose();
+                    carColor.removeIndex(0);
                 }
             }
         }
@@ -293,8 +323,10 @@ public class GameScreen implements Screen {
 //        rainMusic.dispose();
 //        stormTheme.dispose();
         setMusic.dispose();
-        setObject.dispose();
-        setPlayer.dispose();
+        for (Texture texture: setObject) {
+            texture.dispose();
+        }
+//        setPlayer.dispose();
     }
 
     @Override

@@ -23,6 +23,7 @@ public class GameOverScreen implements Screen {
     private TextButton restart;
     private int cijfer=1;
     private Label.LabelStyle titleStyle;
+    Skin skin;
 
 
     public GameOverScreen(final Drop game, int points) {
@@ -47,7 +48,7 @@ public class GameOverScreen implements Screen {
         ArrayList<ArrayList<String>> query = QueryRepository.getTopTen();
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
-        Skin skin = new Skin(Gdx.files.internal("skin/craftacular-ui.json"));
+        skin = new Skin(Gdx.files.internal("skin/craftacular-ui.json"));
 
 
         Label nummer = new Label("RANK",skin);
@@ -138,5 +139,6 @@ public class GameOverScreen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
+        skin.dispose();
     }
 }

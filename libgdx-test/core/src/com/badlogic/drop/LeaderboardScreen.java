@@ -23,6 +23,7 @@ public class LeaderboardScreen implements Screen {
     private TextButton Done;
     private int cijfer=1;
     private Label.LabelStyle titleStyle;
+    Skin skin;
 
 
     public LeaderboardScreen(final Drop game) {
@@ -36,7 +37,7 @@ public class LeaderboardScreen implements Screen {
         ArrayList<ArrayList<String>> query = QueryRepository.getTopTen();
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
-        Skin skin = new Skin(Gdx.files.internal("skin/craftacular-ui.json"));
+        skin = new Skin(Gdx.files.internal("skin/craftacular-ui.json"));
 
 
         Label nummer = new Label("RANK",skin);
@@ -87,6 +88,7 @@ public class LeaderboardScreen implements Screen {
     }
 
     public void tbStartClicked() {
+        dispose();
         game.setScreen(new MainMenuScreen(game, game.name));
     }
 
@@ -94,7 +96,6 @@ public class LeaderboardScreen implements Screen {
         ScreenUtils.clear(60/255f, 30/255f, 30/255f, 1);
         stage.act(delta);
         stage.draw();
-
     }
 
     @Override
@@ -125,5 +126,6 @@ public class LeaderboardScreen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
+        skin.dispose();
     }
 }

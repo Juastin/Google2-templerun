@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
@@ -31,9 +32,9 @@ import java.util.ArrayList;
 
 public class MainMenuScreen implements Screen {
     final Drop game;
+    public String username;
 
     private Label.LabelStyle titleStyle;
-
     private Label lTitle;
     private TextField tfUsername;
     private Label lUsername;
@@ -41,9 +42,8 @@ public class MainMenuScreen implements Screen {
     private TextButton tbLeaderboard;
     private Stage stage;
     public Skin skin;
-    Sound menuClick;
 
-    public String username;
+    Sound menuClick;
 
     //Connectie voor Arduino
     private long diff, start = System.currentTimeMillis();
@@ -63,20 +63,20 @@ public class MainMenuScreen implements Screen {
     private SpriteBatch batch;
     ShaderProgram shader;
     Texture transition;
-    float time = 0;
-    float addtime = 0.05f;
     boolean doTrans;
     TransitionRenders test;
+    Screen goToScreen;
 
     public MainMenuScreen(final Drop game, String name) {
         this.game = game;
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 480);
-        batch = new SpriteBatch();
+
 
         //transition setup
+        batch = new SpriteBatch();
         shader = new ShaderProgram(batch.getShader().getVertexShaderSource(), Gdx.files.internal("Fragment.fsh").readString());
         transition = new Texture(Gdx.files.internal("trans4.png"));
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false, 800, 480);
 
         if (!game.connectAttempted) {
             //Socket connectie maken via ssh met Raspberry Pi
@@ -109,10 +109,9 @@ public class MainMenuScreen implements Screen {
             game.connectAttempted = true;
         }
 
-        menuClick = Gdx.audio.newSound(Gdx.files.internal("minecraft_click.mp3"));
-
         titleStyle = new Label.LabelStyle();
         titleStyle.font = new BitmapFont(Gdx.files.internal("font/font-title-export.fnt"));
+        menuClick = Gdx.audio.newSound(Gdx.files.internal("minecraft_click.mp3"));
 
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
@@ -129,6 +128,8 @@ public class MainMenuScreen implements Screen {
         } else {
             tfUsername = new TextField("", skin);
         }
+
+        //Positie voor de onderdelen
         tfUsername.setSize(500, 60);
         tfUsername.setPosition(stage.getWidth() / 2 - tfUsername.getWidth()/2, stage.getHeight() / 2 - tfUsername.getHeight()/2);
         tbStart = new TextButton("Play", skin);
@@ -158,13 +159,16 @@ public class MainMenuScreen implements Screen {
             public void touchUp(InputEvent e, float x, float y, int point, int button) {
                 doTrans = true;
                 menuClick.play();
-                test= new TransitionRenders();
+                test = new TransitionRenders();
+                goToScreen = new LeaderboardScreen(game);
             }
         });
     }
 
     public void tbStartClicked() {
+        doTrans = true;
         menuClick.play();
+        test= new TransitionRenders();
         if (!tfUsername.getText().equals("")) {
             game.screen.username = tfUsername.getText();
         } else {
@@ -172,8 +176,7 @@ public class MainMenuScreen implements Screen {
         }
         QueryRepository.insertName(game.screen.username);
         System.out.println("player: " + game.screen.username);
-        game.setScreen(new GameScreen(game));
-        dispose();
+        goToScreen = new GameScreen(game);
     }
 
     public void render(float delta) {
@@ -186,8 +189,8 @@ public class MainMenuScreen implements Screen {
         if (doTrans) {
             test.transitionOut(batch, shader, transition);
             if (test.time <= -1) {
-                game.setScreen(new LeaderboardScreen(game));
                 dispose();
+                game.setScreen(goToScreen);
             }
         }
     }
@@ -220,5 +223,9 @@ public class MainMenuScreen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
+        shader.dispose();
+        batch.dispose();
+        transition.dispose();
+        skin.dispose();
     }
 }
