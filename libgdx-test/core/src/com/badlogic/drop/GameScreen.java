@@ -326,7 +326,7 @@ public class GameScreen implements Screen {
         for (Texture texture: setObject) {
             texture.dispose();
         }
-//        setPlayer.dispose();
+        setPlayer.dispose();
     }
 
     @Override

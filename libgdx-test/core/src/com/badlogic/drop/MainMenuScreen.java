@@ -73,8 +73,8 @@ public class MainMenuScreen implements Screen {
 
         //transition setup
         batch = new SpriteBatch();
-        shader = new ShaderProgram(batch.getShader().getVertexShaderSource(), Gdx.files.internal("Fragment.fsh").readString());
-        transition = new Texture(Gdx.files.internal("trans4.png"));
+//        shader = new ShaderProgram(batch.getShader().getVertexShaderSource(), Gdx.files.internal("Fragment.fsh").readString());
+//        transition = new Texture(Gdx.files.internal("trans4.png"));
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 480);
 
@@ -157,18 +157,17 @@ public class MainMenuScreen implements Screen {
         tbLeaderboard.addListener(new ClickListener() {
             @Override
             public void touchUp(InputEvent e, float x, float y, int point, int button) {
-                doTrans = true;
                 menuClick.play();
-                test = new TransitionRenders();
-                goToScreen = new LeaderboardScreen(game);
+                game.setScreen(new LeaderboardScreen(game));
+//                doTrans = true;
+//                test = new TransitionRenders();
+//                goToScreen = new LeaderboardScreen(game);
             }
         });
     }
 
     public void tbStartClicked() {
-        doTrans = true;
         menuClick.play();
-        test= new TransitionRenders();
         if (!tfUsername.getText().equals("")) {
             game.screen.username = tfUsername.getText();
         } else {
@@ -176,7 +175,9 @@ public class MainMenuScreen implements Screen {
         }
         QueryRepository.insertName(game.screen.username);
         System.out.println("player: " + game.screen.username);
-        goToScreen = new GameScreen(game);
+//        doTrans = true;
+//        test= new TransitionRenders();
+//        goToScreen = new GameScreen(game);
     }
 
     public void render(float delta) {
@@ -186,13 +187,13 @@ public class MainMenuScreen implements Screen {
 
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
-        if (doTrans) {
-            test.transitionOut(batch, shader, transition);
-            if (test.time <= -1) {
-                dispose();
-                game.setScreen(goToScreen);
-            }
-        }
+//        if (doTrans) {
+//            test.transitionOut(batch, shader, transition);
+//            if (test.time <= -1) {
+//                dispose();
+//                game.setScreen(goToScreen);
+//            }
+//        }
     }
 
     @Override
