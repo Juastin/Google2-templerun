@@ -271,7 +271,7 @@ public class GameScreen implements Screen {
         if(!pauze) {
             if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){pauze=false;}
             setMusic.play();
-            if (TimeUtils.nanoTime() - lastDropTime > 1500000000 - (difficulty.getValue() + Math.min(dropsGathered, 200) * 3000000))
+            if (TimeUtils.nanoTime() - lastDropTime > 1300000000 - (difficulty.getValue() + Math.min(dropsGathered, 150) * 6000000))
                 spawnRaindrop();
 
             // move the raindrops, remove any that are beneath the bottom edge of

@@ -175,6 +175,7 @@ public class MainMenuScreen implements Screen {
         }
         QueryRepository.insertName(game.screen.username);
         System.out.println("player: " + game.screen.username);
+        game.setScreen(new GameScreen(game));
 //        doTrans = true;
 //        test= new TransitionRenders();
 //        goToScreen = new GameScreen(game);
