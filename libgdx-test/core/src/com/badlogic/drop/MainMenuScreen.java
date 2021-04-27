@@ -41,7 +41,7 @@ public class MainMenuScreen implements Screen {
     private TextButton tbStart;
     private TextButton tbLeaderboard;
     private Stage stage;
-    public Skin skin;
+    private Skin skin;
 
     Sound menuClick;
 
@@ -62,14 +62,13 @@ public class MainMenuScreen implements Screen {
     OrthographicCamera camera;
     private SpriteBatch batch;
     ShaderProgram shader;
-    Texture transition;
-    boolean doTrans;
-    TransitionRenders test;
-    Screen goToScreen;
+//    Texture transition;
+//    boolean doTrans;
+//    TransitionRenders test;
+//    Screen goToScreen;
 
     public MainMenuScreen(final Drop game, String name) {
         this.game = game;
-
 
         //transition setup
         batch = new SpriteBatch();
@@ -119,9 +118,10 @@ public class MainMenuScreen implements Screen {
 
         //Maken onderdelen voor scherm
         lTitle = new Label("Temple Run",titleStyle);
-        lTitle.setPosition(stage.getWidth()/2 - lTitle.getWidth()/2,350);
         lUsername = new Label("Enter username:", skin);
-        lUsername.setPosition(stage.getWidth() / 2 - lUsername.getWidth()/2, stage.getHeight() / 2 - lUsername.getHeight()/2+50);
+        tbStart = new TextButton("Play", skin);
+        tbLeaderboard = new TextButton("Leaderboard", skin);
+
         if (name != null) {
             tfUsername = new TextField(name, skin);
             tfUsername.setTouchable(Touchable.disabled);
@@ -129,14 +129,15 @@ public class MainMenuScreen implements Screen {
             tfUsername = new TextField("", skin);
         }
 
-        //Positie voor de onderdelen
+        //Positie en size voor de onderdelen
         tfUsername.setSize(500, 60);
-        tfUsername.setPosition(stage.getWidth() / 2 - tfUsername.getWidth()/2, stage.getHeight() / 2 - tfUsername.getHeight()/2);
-        tbStart = new TextButton("Play", skin);
         tbStart.setSize(300, 60);
-        tbStart.setPosition(stage.getWidth() / 2 - tbStart.getWidth()/2, stage.getHeight() / 2 - tbStart.getHeight()/2-70);
-        tbLeaderboard = new TextButton("Leaderboard", skin);
         tbLeaderboard.setSize(300, 60);
+
+        lTitle.setPosition(stage.getWidth()/2 - lTitle.getWidth()/2,350);
+        lUsername.setPosition(stage.getWidth() / 2 - lUsername.getWidth()/2, stage.getHeight() / 2 - lUsername.getHeight()/2+50);
+        tfUsername.setPosition(stage.getWidth() / 2 - tfUsername.getWidth()/2, stage.getHeight() / 2 - tfUsername.getHeight()/2);
+        tbStart.setPosition(stage.getWidth() / 2 - tbStart.getWidth()/2, stage.getHeight() / 2 - tbStart.getHeight()/2-70);
         tbLeaderboard.setPosition(stage.getWidth() / 2 - tbStart.getWidth()/2, stage.getHeight() / 2 - tbStart.getHeight()/2-140);
 
         //Toevoegen onderdelen aan scherm
@@ -198,6 +199,15 @@ public class MainMenuScreen implements Screen {
     }
 
     @Override
+    public void dispose() {
+        stage.dispose();
+        shader.dispose();
+        batch.dispose();
+        skin.dispose();
+//        transition.dispose();
+    }
+
+    @Override
     public void show() {
 
     }
@@ -220,14 +230,5 @@ public class MainMenuScreen implements Screen {
     @Override
     public void hide() {
 
-    }
-
-    @Override
-    public void dispose() {
-        stage.dispose();
-        shader.dispose();
-        batch.dispose();
-        transition.dispose();
-        skin.dispose();
     }
 }
