@@ -69,4 +69,16 @@ public class QueryRepository {
             return null;
         }
     }
+
+    public static ArrayList<ArrayList<String>> getPeronalBest(int id) {
+        try {
+            PreparedStatement myStmt = verbinding.prepareStatement("SELECT MAX(score) FROM highscore WHERE playerID=?");
+            myStmt.setInt(1, id);
+            ArrayList<ArrayList<String>> results = Database.query(myStmt);
+            return results;
+        } catch (Exception e) {
+            System.out.println("Fout met ophalen van leaderboard");
+            return null;
+        }
+    }
 }

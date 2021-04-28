@@ -11,7 +11,8 @@ public class Drop extends Game {
     public SpriteBatch batch;
     public BitmapFont font;
     public MainMenuScreen screen;
-    private String name;
+    public String name;
+    boolean connectAttempted = false;
 
     public Drop () {
         this.name = null;
