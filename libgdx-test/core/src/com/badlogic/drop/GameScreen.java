@@ -22,7 +22,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-import org.graalvm.compiler.debug.CSVUtil;
 
 public class GameScreen implements Screen {
     final Drop game;
@@ -175,41 +174,40 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         //Ophalen button data van Raspberry Pi
-
-        if (game.screen.sleep ==3) {
-
-            try {
-                game.screen.mySocket.setSoTimeout(1);
-                game.screen.mySocket.receive(game.screen.packet);
-                String message = new String(game.screen.buffer);
-                game.screen.input = message;
-            } catch (IOException ignored) {
-            }
-            game.screen.sleep = 0;
-        } else {
-            game.screen.input = game.screen.previousinput;
-        }
-
-        game.screen.sleep++;
-
-        if(game.screen.input.contains("left")||game.screen.input.contains("right")){pauze=false;}
-
-
-        // clear the screen with a dark blue color. The
-        // arguments to clear are the red, green
-        // blue and alpha component in the range [0,1]
-        // of the color to be used to clear the screen.
-        ScreenUtils.clear(rwaarde.getValue()/255f, gwaarde.getValue()/255f, bwaarde.getValue()/255f, 1);
-
-        // tell the camera to update its matrices.
-        camera.update();
-
-        // tell the SpriteBatch to render in the
-        // coordinate system specified by the camera.
-        game.batch.setProjectionMatrix(camera.combined);
-
+        getRaspberryController();
         // begin a new batch and draw the bucket and
         // all drops
+        drawobjects();
+        processcontroller();
+        if(pauze){
+            showPause();
+            stage.act(delta);
+            stage.draw();
+        }
+        // make sure the player stays within the screen bounds
+        if (player.x < 0)
+            player.x = 0;
+        if (player.x > 800 - playerWidth)
+            player.x = 800 - playerWidth;
+        // check if we need to create a new raindrop
+        createcar();
+    }
+
+    public void processcontroller(){
+        if(game.screen.input.contains("P")){
+            pauze=true;
+        }
+
+        if(game.screen.input.contains("left") || game.screen.input.contains("A")&&!pauze) {
+            player.x -= 800 * Gdx.graphics.getDeltaTime();
+        }
+        if(game.screen.input.contains("right") || game.screen.input.contains("D")&&!pauze) player.x += 800 * Gdx.graphics.getDeltaTime();
+        if(game.screen.input.contains("middle") || Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){pauze=true;}
+        game.screen.previousinput = game.screen.input;
+        game.screen.input = "";
+    }
+
+    public void drawobjects(){
         game.batch.begin();
         if (backgroundoffset == -480) {
             backgroundoffset = 0;
@@ -225,7 +223,6 @@ public class GameScreen implements Screen {
         game.font.draw(game.batch, "Points: " + dropsGathered, 10, 470);
         game.batch.end();
 
-
         if(!pauze) {
             backgroundoffset-= 1;
             // process user input
@@ -236,29 +233,26 @@ public class GameScreen implements Screen {
                 player.x = touchPos.x - playerWidth / 2;
             }
         }
+    }
 
-        if(game.screen.input.contains("left") || game.screen.input.contains("A")) {
-            player.x -= 800 * Gdx.graphics.getDeltaTime();
+    public void getRaspberryController(){
+        if (game.screen.sleep ==3) {
+            try {
+                game.screen.mySocket.setSoTimeout(1);
+                game.screen.mySocket.receive(game.screen.packet);
+                String message = new String(game.screen.buffer);
+                game.screen.input = message;
+            } catch (IOException ignored) {
+            }
+            game.screen.sleep = 0;
+        } else {
+            game.screen.input = game.screen.previousinput;
         }
-        if(game.screen.input.contains("right") || game.screen.input.contains("D")) player.x += 800 * Gdx.graphics.getDeltaTime();
-        if(game.screen.input.contains("middle") || Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){pauze=true;}
-        game.screen.previousinput = game.screen.input;
+        game.screen.sleep++;
+        if(game.screen.input.contains("left")||game.screen.input.contains("right")){pauze=false;}
+    }
 
-        game.screen.input = "";
-
-        if(pauze){
-            showPause();
-            stage.act(delta);
-            stage.draw();
-        }
-
-        // make sure the bucket stays within the screen bounds
-        if (player.x < 0)
-            player.x = 0;
-        if (player.x > 800 - playerWidth)
-            player.x = 800 - playerWidth;
-
-        // check if we need to create a new raindrop
+    public void createcar(){
         if(!pauze) {
             if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){pauze=false;}
             setMusic.play();
