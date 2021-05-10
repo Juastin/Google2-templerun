@@ -17,13 +17,13 @@ Returns data in the following format:
 
 public class Database {
     //Local database test
-    static String host = "jdbc:mysql://localhost:3306/templerun";
-    static String username = "root";
-    static String password = "";
+//    static String host = "jdbc:mysql://localhost:3306/templerun";
+//    static String username = "root";
+//    static String password = "";
 
-//    static String host = "jdbc:mysql://40.113.153.48/templerun";
-//    static String username = "newRemote";
-//    static String password = "P@ssw0rd";
+    static String host = "jdbc:mysql://40.113.153.48/templerun";
+    static String username = "newRemote";
+    static String password = "P@ssw0rd";
 
     public static Connection maakVerbinding() {
         try {

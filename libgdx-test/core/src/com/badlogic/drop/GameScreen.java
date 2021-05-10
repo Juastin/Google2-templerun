@@ -5,7 +5,6 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -13,14 +12,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 
 public class GameScreen implements Screen {
@@ -46,14 +43,13 @@ public class GameScreen implements Screen {
     private int backgroundoffset = 0;
 
     private TextButton con;
-    private Slider rwaarde;
+    private Slider volume;
     private Slider gwaarde;
     private Slider bwaarde;
     private Slider difficulty;
     private Label moeilijkheid;
-    private Label rood;
-    private Label groen;
-    private Label blauw;
+    private Label volumetext;
+
 
     private long lastDropTime;
     private int dropsGathered;
@@ -109,43 +105,35 @@ public class GameScreen implements Screen {
         moeilijkheid.setTouchable(Touchable.disabled);
 
         difficulty = new Slider(100,600,1,false,skin);
-        rood = new Label("R",skin);
-        groen = new Label("G",skin);
-        blauw = new Label("B",skin);
-        rood.setTouchable(Touchable.disabled);
-        groen.setTouchable(Touchable.disabled);
-        blauw.setTouchable(Touchable.disabled);
+        volumetext = new Label("Volume",skin);
+        volumetext.setTouchable(Touchable.disabled);
 
         difficulty.setWidth(moeilijkheid.getWidth()+50);
-        rwaarde = new Slider(0,255,1,false,skin);
+        volume = new Slider(0,100,1,false,skin);
         gwaarde = new Slider(0,255,1,false,skin);
         bwaarde = new Slider(0,255,1,false,skin);
 
         con.setPosition(200,80);
         difficulty.setPosition(400,400);
-        rwaarde.setPosition(200,400);
+        volume.setPosition(200,400);
         gwaarde.setPosition(200,300);
         bwaarde.setPosition(200,200);
 
         moeilijkheid.setPosition((difficulty.getX()+difficulty.getWidth()/2)-moeilijkheid.getWidth()/2,415);
-        rood.setPosition((rwaarde.getX()+rwaarde.getWidth()/2)-rood.getWidth()/2,410);
-        groen.setPosition((gwaarde.getX()+gwaarde.getWidth()/2)-groen.getWidth()/2,310);
-        blauw.setPosition((bwaarde.getX()+bwaarde.getWidth()/2)-blauw.getWidth()/2,210);
+        volumetext.setPosition((volume.getX()+volume.getWidth()/2)- volumetext.getWidth()/2,410);
+
 
         difficulty.setValue(200);
-        rwaarde.setValue(0);
+        volume.setValue(50);
         gwaarde.setValue(0);
         bwaarde.setValue(51);
 
         stage.addActor(difficulty);
         stage.addActor(moeilijkheid);
         stage.addActor(con);
-        stage.addActor(rwaarde);
-        stage.addActor(gwaarde);
-        stage.addActor(bwaarde);
-        stage.addActor(rood);
-        stage.addActor(groen);
-        stage.addActor(blauw);
+        stage.addActor(volume);
+        stage.addActor(volumetext);
+
 
         con.addListener(new ClickListener() {
             @Override
@@ -191,6 +179,7 @@ public class GameScreen implements Screen {
             player.x = 800 - playerWidth;
         // check if we need to create a new raindrop
         createcar();
+        setMusic.setVolume(volume.getValue()/100);
     }
 
     public void processcontroller(){
@@ -286,14 +275,12 @@ public class GameScreen implements Screen {
     public void showPause() {
         setMusic.pause();
         con.setVisible(true);
-        rwaarde.setVisible(true);
+        volume.setVisible(true);
         gwaarde.setVisible(true);
         bwaarde.setVisible(true);
         difficulty.setVisible(true);
         moeilijkheid.setVisible(true);
-        rood.setVisible(true);
-        groen.setVisible(true);
-        blauw.setVisible(true);
+        volumetext.setVisible(true);
     }
 
     public void change(){
@@ -314,6 +301,7 @@ public class GameScreen implements Screen {
         // start the playback of the background music
         // when the screen is shown
         setMusic.play();
+
     }
 
     @Override
