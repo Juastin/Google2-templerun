@@ -141,7 +141,6 @@ public class GameOverScreen implements Screen {
             @Override
             public void touchUp(InputEvent e, float x, float y, int point, int button) {
                 tbRestartClicked();
-                game.screen.menuClick.play();
             }
         });
 
@@ -199,7 +198,6 @@ public class GameOverScreen implements Screen {
             @Override
             public void touchUp(InputEvent e, float x, float y, int point, int button) {
                 tbRestartClicked();
-                game.screen.menuClick.play();
             }
         });
 
@@ -207,7 +205,6 @@ public class GameOverScreen implements Screen {
             @Override
             public void touchUp(InputEvent e, float x, float y, int point, int button) {
                 tbMainMenuClicked();
-                game.screen.menuClick.play();
             }
         });
     }
